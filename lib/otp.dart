@@ -6,21 +6,14 @@ import 'package:http/http.dart' as http;
 import 'Register.dart';
 import 'home.dart';
 
-Map<String, String> Hearder = {
-  "OS-NAME": "android",
-  "OS-VERSION": "2.0.1",
-  "APP-VERSION": "1.0.0",
-  "Content-Type": "application/json",
-  "DEVICE-NAME": "iphone 6",
-  "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
-  "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN",
-};
+
+
 
 Future<Result> fetchLogin(String username, String password) async {
 
   String body = '{ "account":"${username}", "pass":"${password}" }';
   final response = await http.post(
-      Uri.parse('https://customer.vila-co.com/v1/api/login'),
+      Uri.parse(Config.url),
       headers: Hearder,
       body: body
   );
