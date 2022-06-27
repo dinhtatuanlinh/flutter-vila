@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vila/read-json.dart';
 import 'Register.dart';
 import 'home.dart';
@@ -36,6 +37,12 @@ class OPTStatefulWidget extends StatefulWidget {
 
 class _OTPStatefulWidgetState extends State<OPTStatefulWidget> {
   late Result futureResult;
+
+  // Future<void> _saveToken(String token) async{
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('token', token);
+  // }
+
 
   TextEditingController OTPController = TextEditingController();
 
@@ -81,11 +88,13 @@ class _OTPStatefulWidgetState extends State<OPTStatefulWidget> {
                       child: ElevatedButton(
                         child: const Text('Submit'),
                         onPressed: () async {
+                          print(widget.username);
                           futureResult = await fetchLogin(widget.username, widget.password, OTPController.text);
 
                           if (futureResult.status == "success") {
                             print('object');
-                            print(futureResult.status);
+                            print(futureResult.data.token);
+                            // _saveToken(futureResult.data.token);
                             // Navigator.push(
                             //   context, MaterialPageRoute(
                             //     builder: (context) => Home(),
@@ -132,6 +141,7 @@ Future<Result> fetchLogin(String username, String password, String otp) async {
       headers: await data.Header(),
       body: body
   );
+  print(response.statusCode);
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.

@@ -1,12 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:vila/read-json.dart';
 import 'Register.dart';
-import 'home.dart';
 import 'otp.dart';
 
 class Login extends StatelessWidget {
@@ -96,7 +92,9 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
                         child: const Text('Login'),
                         onPressed: () async {
                           futureResult = await fetchLogin(nameController.text, passwordController.text);
+                          // print(futureResult.data?.token);
                           if (futureResult.status == "success") {
+                            print(futureResult.status);
                             Navigator.push(
                               context, MaterialPageRoute(
                                 builder: (context) => OTP(username: nameController.text, password: passwordController.text),
@@ -134,15 +132,15 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
   }
 }
 
-Map<String, String> Header = {
-  "OS-NAME": "android",
-  "OS-VERSION": "2.0.1",
-  "APP-VERSION": "1.0.0",
-  "Content-Type": "application/json",
-  "DEVICE-NAME": "iphone 6",
-  "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
-  "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN"
-};
+// Map<String, String> Header = {
+//   "OS-NAME": "android",
+//   "OS-VERSION": "2.0.1",
+//   "APP-VERSION": "1.0.0",
+//   "Content-Type": "application/json",
+//   "DEVICE-NAME": "iphone 6",
+//   "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
+//   "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN"
+// };
 Future<Result> fetchLogin(String username, String password) async {
   var data = new readJson();
   await data.importFile('assets/connect-customer.json');
@@ -152,6 +150,7 @@ Future<Result> fetchLogin(String username, String password) async {
       headers: await data.Header(),
       body: body
   );
+
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -162,29 +161,30 @@ Future<Result> fetchLogin(String username, String password) async {
     throw Exception('Failed to load album');
   }
 }
-// class Data {
-//   final String token;
-//   const Data({
-//     required this.token
-//   });
-//   factory Data.fromJson(Map<String, dynamic> json){
-//     return Data(
-//       token: json['token']
-//     );
-//   }
-// }
+
+class Data {
+  final String token;
+  const Data({
+    required this.token
+  });
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
+      token: json['token']
+    );
+  }
+}
+
 class Result {
   final String code;
   final String status;
   final String message;
-  // final Data data;
-
+  final Data? data;
 
   const Result({
     required this.code,
     required this.status,
     required this.message,
-    // required this.data,
+    this.data,
   });
 
   factory Result.fromJson(Map<String, dynamic> json) {
@@ -192,7 +192,7 @@ class Result {
       code: json['code'],
       status: json['status'],
       message: json['message'],
-      // data: Data.fromJson(json['data'])
+      data: json['data'] != null ? Data.fromJson(json['data']) : Data.fromJson({"token": ""})
     );
   }
 }

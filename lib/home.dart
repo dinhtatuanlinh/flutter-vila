@@ -3,6 +3,61 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<Home> {
+  late Future<Album> futureAlbum;
+  late Future<String> token;
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+    // token = getToken();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Fetch Data Example'),
+        ),
+        body: Center(
+          child: FutureBuilder<Album>(
+            future: futureAlbum,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                // print(snapshot.data!.title);
+                return Text('token: ${token}');
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Future<Token> getToken() async{
+//   final prefs = await SharedPreferences.getInstance();
+//   return prefs.getString('token') ?? "";
+// }
 
 Future<Album> fetchAlbum() async {
   final response = await http
@@ -38,51 +93,9 @@ class Album {
     );
   }
 }
-
-class Home extends StatefulWidget {
-  const Home({super.key});
-
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<Home> {
-  late Future<Album> futureAlbum;
-
-  @override
-  void initState() {
-    super.initState();
-    futureAlbum = fetchAlbum();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fetch Data Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Fetch Data Example'),
-        ),
-        body: Center(
-          child: FutureBuilder<Album>(
-            future: futureAlbum,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                print(snapshot.data!.title);
-                return Text('userId: ${snapshot.data!.userId} \n title: ${snapshot.data!.title}');
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            },
-          ),
-        ),
-      ),
-    );
-  }
+class Token {
+  final String token;
+  const Token({
+    required this.token,
+  });
 }

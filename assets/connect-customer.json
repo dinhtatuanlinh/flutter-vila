@@ -1,5 +1,5 @@
 {
-  "domain" : "https://customer.vila-co.com",
+  "domain" : "https://staging-customer.vila-co.com",
   "header" : {
     "OS-NAME": "android",
     "OS-VERSION": "2.0.1",
