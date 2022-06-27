@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:vila/read-json.dart';
 import 'Register.dart';
 import 'otp.dart';
+import 'dart:io' show Platform;
+import 'package:device_info_plus/device_info_plus.dart';
 
 class Login extends StatelessWidget {
   static const String _title = 'Sample App';
@@ -144,10 +146,25 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
 Future<Result> fetchLogin(String username, String password) async {
   var data = new readJson();
   await data.importFile('assets/connect-customer.json');
+  Map<String, String> Headers = await data.Header();
+
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  if(Platform.isAndroid){
+    AndroidDeviceInfo info = await deviceInfo.androidInfo;
+    Headers['OS-NAME'] = "android";
+    Headers['OS-VERSION'] = info.version.release!;
+    Headers['DEVICE-NAME'] = info.device!;
+
+  }else if(Platform.isIOS){
+    IosDeviceInfo info = await deviceInfo.iosInfo;
+    Headers['OS-NAME'] = "IOS";
+    Headers['OS-VERSION'] = info.systemVersion!;
+    Headers['DEVICE-NAME'] = info.model!;
+  }
   String body = '{ "account":"${username}", "pass":"${password}" }';
   final response = await http.post(
       Uri.parse('${await data.domain()}/v1/api/login'),
-      headers: await data.Header(),
+      headers: Headers,
       body: body
   );
 
