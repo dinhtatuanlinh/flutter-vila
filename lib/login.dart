@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:vila/read-json.dart';
 import 'Register.dart';
 import 'otp.dart';
+import 'dart:io' show Platform;
+import 'package:device_info_plus/device_info_plus.dart';
 
 class Login extends StatelessWidget {
   static const String _title = 'Sample App';
@@ -142,6 +144,23 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
 //   "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN"
 // };
 Future<Result> fetchLogin(String username, String password) async {
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  if(Platform.isAndroid){
+    AndroidDeviceInfo info = await deviceInfo.androidInfo;
+    print(info.version);
+    print(info.board);
+    // print(info.bootloader);
+    print(info.brand);
+    print(info.device);
+    print("#######################");
+  }else if(Platform.isIOS){
+    IosDeviceInfo info = await deviceInfo.iosInfo;
+    print(info.name);
+    print(info.systemName);
+    print(info.systemVersion);
+    print(info.model);
+    print(info.localizedModel);
+  }
   var data = new readJson();
   await data.importFile('assets/connect-customer.json');
   String body = '{ "account":"${username}", "pass":"${password}" }';
