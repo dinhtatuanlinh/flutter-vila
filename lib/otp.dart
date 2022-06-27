@@ -3,68 +3,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:vila/read-json.dart';
 import 'Register.dart';
 import 'home.dart';
 
-
-
-
-Future<Result> fetchLogin(String username, String password) async {
-
-  String body = '{ "account":"${username}", "pass":"${password}" }';
-  final response = await http.post(
-      Uri.parse(Config.url),
-      headers: Hearder,
-      body: body
-  );
-  // String rs = '{ "code": "", "status": "success", "message": "Thành công", "data": { "token":"1d3ef54f95bb651618db" }}';
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return Result.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-
-    throw Exception('Failed to load album');
-  }
-}
-// class Data {
-//   final String token;
-//   const Data({
-//     required this.token
-//   });
-//   factory Data.fromJson(Map<String, dynamic> json){
-//     return Data(
-//       token: json['token']
-//     );
-//   }
-// }
-class Result {
-  final String code;
-  final String status;
-  final String message;
-  // final Data data;
-
-
-  const Result({
-    required this.code,
-    required this.status,
-    required this.message,
-    // required this.data,
-  });
-
-  factory Result.fromJson(Map<String, dynamic> json) {
-    return Result(
-      code: json['code'],
-      status: json['status'],
-      message: json['message'],
-      // data: Data.fromJson(json['data'])
-    );
-  }
-}
-
-class Login extends StatelessWidget {
+class OTP extends StatelessWidget {
   static const String _title = 'Sample App';
+  const OTP({ required this.username, required this.password});
+  final String username;
+  final String password;
 
   @override
   Widget build(BuildContext context) {
@@ -72,24 +19,25 @@ class Login extends StatelessWidget {
       title: _title,
       home: Scaffold(
         // appBar: AppBar(title: const Text(_title)),
-        body: const LoginStatefulWidget(),
+        body: OPTStatefulWidget(username: username, password: password),
       ),
     );
   }
 }
 
-class LoginStatefulWidget extends StatefulWidget {
-  const LoginStatefulWidget({Key? key}) : super(key: key);
+class OPTStatefulWidget extends StatefulWidget {
+  const OPTStatefulWidget({required this.username, required this.password});
+  final String username;
+  final String password;
 
   @override
-  State<LoginStatefulWidget> createState() => _LoginStatefulWidgetState();
+  State<OPTStatefulWidget> createState() => _OTPStatefulWidgetState();
 }
 
-class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
+class _OTPStatefulWidgetState extends State<OPTStatefulWidget> {
   late Result futureResult;
 
-  TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController OTPController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -119,37 +67,21 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
-                      controller: nameController,
+                      controller: OTPController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'User Name',
+                        labelText: 'OTP code',
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                    child: TextField(
-                      obscureText: true,
-                      controller: passwordController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      //forgot password screen
-                    },
-                    child: const Text('Forgot Password',),
-                  ),
+
                   Container(
                       height: 50,
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: ElevatedButton(
-                        child: const Text('Login'),
+                        child: const Text('Submit'),
                         onPressed: () async {
-                          futureResult = await fetchLogin(nameController.text, passwordController.text);
+                          futureResult = await fetchLogin(widget.username, widget.password, OTPController.text);
 
                           if (futureResult.status == "success") {
                             print('object');
@@ -188,5 +120,62 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
               )
           )
       );
+  }
+}
+
+Future<Result> fetchLogin(String username, String password, String otp) async {
+  var data = new readJson();
+  await data.importFile('assets/connect-customer.json');
+  String body = '{ "account":"${username}", "pass":"${password}", "otp": "${otp}" }';
+  final response = await http.post(
+      Uri.parse('${await data.domain()}/v1/api/login/confirm-otp'),
+      headers: await data.Header(),
+      body: body
+  );
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    print(response.body);
+    return Result.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+
+    throw Exception('Failed to load album');
+  }
+}
+
+class Data {
+  final String token;
+  const Data({
+    required this.token
+  });
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
+      token: json['token']
+    );
+  }
+}
+
+class Result {
+  final String code;
+  final String status;
+  final String message;
+  final Data data;
+
+
+  const Result({
+    required this.code,
+    required this.status,
+    required this.message,
+    required this.data,
+  });
+
+  factory Result.fromJson(Map<String, dynamic> json) {
+    return Result(
+      code: json['code'],
+      status: json['status'],
+      message: json['message'],
+      data: Data.fromJson(json['data'])
+    );
   }
 }

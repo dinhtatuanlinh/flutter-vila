@@ -2,73 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:vila/read-json.dart';
 import 'Register.dart';
 import 'home.dart';
-
-Map<String, String> Hearder = {
-  "OS-NAME": "android",
-  "OS-VERSION": "2.0.1",
-  "APP-VERSION": "1.0.0",
-  "Content-Type": "application/json",
-  "DEVICE-NAME": "iphone 6",
-  "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
-  "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN",
-};
-
-Future<Result> fetchLogin(String username, String password) async {
-
-  String body = '{ "account":"${username}", "pass":"${password}" }';
-  final response = await http.post(
-      Uri.parse('https://customer.vila-co.com/v1/api/login'),
-      headers: Hearder,
-      body: body
-  );
-  // String rs = '{ "code": "", "status": "success", "message": "Thành công", "data": { "token":"1d3ef54f95bb651618db" }}';
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return Result.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-
-    throw Exception('Failed to load album');
-  }
-}
-// class Data {
-//   final String token;
-//   const Data({
-//     required this.token
-//   });
-//   factory Data.fromJson(Map<String, dynamic> json){
-//     return Data(
-//       token: json['token']
-//     );
-//   }
-// }
-class Result {
-  final String code;
-  final String status;
-  final String message;
-  // final Data data;
-
-
-  const Result({
-    required this.code,
-    required this.status,
-    required this.message,
-    // required this.data,
-  });
-
-  factory Result.fromJson(Map<String, dynamic> json) {
-    return Result(
-      code: json['code'],
-      status: json['status'],
-      message: json['message'],
-      // data: Data.fromJson(json['data'])
-    );
-  }
-}
+import 'otp.dart';
 
 class Login extends StatelessWidget {
   static const String _title = 'Sample App';
@@ -157,15 +96,12 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
                         child: const Text('Login'),
                         onPressed: () async {
                           futureResult = await fetchLogin(nameController.text, passwordController.text);
-
                           if (futureResult.status == "success") {
-                            print('object');
-                            print(futureResult.status);
-                            // Navigator.push(
-                            //   context, MaterialPageRoute(
-                            //     builder: (context) => Home(),
-                            //   ),
-                            // );
+                            Navigator.push(
+                              context, MaterialPageRoute(
+                                builder: (context) => OTP(username: nameController.text, password: passwordController.text),
+                              ),
+                            );
                           } else{
                             print(futureResult.message);
                           }
@@ -195,5 +131,68 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
               )
           )
       );
+  }
+}
+
+Map<String, String> Header = {
+  "OS-NAME": "android",
+  "OS-VERSION": "2.0.1",
+  "APP-VERSION": "1.0.0",
+  "Content-Type": "application/json",
+  "DEVICE-NAME": "iphone 6",
+  "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
+  "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN"
+};
+Future<Result> fetchLogin(String username, String password) async {
+  var data = new readJson();
+  await data.importFile('assets/connect-customer.json');
+  String body = '{ "account":"${username}", "pass":"${password}" }';
+  final response = await http.post(
+      Uri.parse('${await data.domain()}/v1/api/login'),
+      headers: await data.Header(),
+      body: body
+  );
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return Result.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+
+    throw Exception('Failed to load album');
+  }
+}
+// class Data {
+//   final String token;
+//   const Data({
+//     required this.token
+//   });
+//   factory Data.fromJson(Map<String, dynamic> json){
+//     return Data(
+//       token: json['token']
+//     );
+//   }
+// }
+class Result {
+  final String code;
+  final String status;
+  final String message;
+  // final Data data;
+
+
+  const Result({
+    required this.code,
+    required this.status,
+    required this.message,
+    // required this.data,
+  });
+
+  factory Result.fromJson(Map<String, dynamic> json) {
+    return Result(
+      code: json['code'],
+      status: json['status'],
+      message: json['message'],
+      // data: Data.fromJson(json['data'])
+    );
   }
 }
