@@ -38,10 +38,14 @@ class OPTStatefulWidget extends StatefulWidget {
 class _OTPStatefulWidgetState extends State<OPTStatefulWidget> {
   late Result futureResult;
 
-  // Future<void> _saveToken(String token) async{
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.setString('token', token);
-  // }
+  Future<void> _saveToken(String token) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+  }
+  Future<void> _getToken(String token) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.getString('token');
+  }
 
 
   TextEditingController OTPController = TextEditingController();
@@ -94,7 +98,8 @@ class _OTPStatefulWidgetState extends State<OPTStatefulWidget> {
                           if (futureResult.status == "success") {
                             print('object');
                             print(futureResult.data.token);
-                            // _saveToken(futureResult.data.token);
+                            _saveToken(futureResult.data.token);
+                            print(_getToken("token"));
                             // Navigator.push(
                             //   context, MaterialPageRoute(
                             //     builder: (context) => Home(),

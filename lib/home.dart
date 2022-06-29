@@ -14,12 +14,18 @@ class Home extends StatefulWidget {
 
 class _MyAppState extends State<Home> {
   late Future<Album> futureAlbum;
-  late Future<String> token;
+  String token = "";
+
+  Future<void> _getToken(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString(key) as String;
+  }
+
   @override
   void initState() {
     super.initState();
     futureAlbum = fetchAlbum();
-    // token = getToken();
+    _getToken("token");
   }
 
   @override
@@ -38,7 +44,7 @@ class _MyAppState extends State<Home> {
             future: futureAlbum,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                // print(snapshot.data!.title);
+                print(token);
                 return Text('token: ${token}');
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
