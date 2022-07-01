@@ -10,6 +10,7 @@ import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
 
 class Login extends StatelessWidget {
+  static const routeName = '/';
   static const String _title = 'Sample App';
 
   @override
@@ -158,15 +159,7 @@ class _LoginStatefulWidgetState extends State<LoginStatefulWidget> {
   }
 }
 
-// Map<String, String> Header = {
-//   "OS-NAME": "android",
-//   "OS-VERSION": "2.0.1",
-//   "APP-VERSION": "1.0.0",
-//   "Content-Type": "application/json",
-//   "DEVICE-NAME": "iphone 6",
-//   "DEVICE-TOKEN": "JSNBDVANDBCKSJSXDANKBVABN",
-//   "FCM-TOKEN": "JSNBDVANDBCKSJSXDANKBVABNJSNBDVANDBCKSJSXDANKBVABJSNBDVANDBCKSJSXDANKBVABN"
-// };
+
 Future<Result> fetchLogin(String username, String password) async {
   var data = new readJson();
   await data.importFile('assets/connect-customer.json');

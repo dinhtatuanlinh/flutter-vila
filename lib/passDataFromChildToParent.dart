@@ -15,7 +15,7 @@ class MyStatefulWidgetState extends State<MyStatefulWidget> {
     return Column(
       children: <Widget>[
         Text('$_string'),
-        MyChildClass(callback: (val) => setState(() => _string = val))
+        MyChildClass(callback: (val) => setState(() => _string = val as int))
       ],
     );
   }
@@ -37,7 +37,7 @@ class MyChildClass extends StatelessWidget {
         ),
         FlatButton(
           onPressed: () {
-            MyStatefulWidget.of(context)?.string = "String from method 2";
+            MyStatefulWidget.of(context)?.string = 1;
           },
           child: const Text("Method 2"),
         )
