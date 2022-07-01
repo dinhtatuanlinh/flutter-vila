@@ -2,10 +2,92 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// class Abc extends StatelessWidget {
+//   const Abc({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // Scaffold is a layout for
+//     // the major Material Components.
+//     return Scaffold(
+//       appBar: AppBar(
+//         leading: const IconButton(
+//           icon: Icon(Icons.menu),
+//           tooltip: 'Navigation menu',
+//           onPressed: null,
+//         ),
+//         title: const Text('Example title'),
+//         actions: const [
+//           IconButton(
+//             icon: Icon(Icons.search),
+//             tooltip: 'Search',
+//             onPressed: null,
+//           ),
+//         ],
+//       ),
+//       // body is the majority of the screen.
+//       body: Center(
+//         child: fooStateful(),
+//       ),
+//       floatingActionButton: const FloatingActionButton(
+//         tooltip: 'Add', // used by assistive technologies
+//         child: Icon(Icons.add),
+//         onPressed: null,
+//       ),
+//     );
+//   }
+// }
+// typedef void StringCallback(String val);
+// class boo extends StatelessWidget {
+//   final StringCallback callback;
+//   boo({required this.callback});
+//   int _counter = 0;
+//   void _increment(){
+//     _counter++;
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     return ElevatedButton(onPressed: _increment, child: const Text('Increment'));
+//   }
+// }
+//
+// class fooStateful extends StatefulWidget {
+//   const fooStateful({required this.counter});
+//   final int counter;
+//
+//   @override
+//   _FooChange createState() => _FooChange();
+// }
+//
+// class _FooChange extends State<fooStateful>{
+//   int _counter = 0;
+//   void _increment(){
+//     setState((){
+//       _counter++;
+//     });
+//   }
+//   @override
+//   Widget build(BuildContext context){
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: <Widget>[
+//         ElevatedButton(onPressed: _increment, child: const Text('Increment')),
+//         const SizedBox(width: 16),
+//         Text('Const: $_counter')
+//       ],
+//     );
+//   }
+// }
+
+
+
+
 class Home extends StatefulWidget {
+  static const routeName = '/home';
   const Home({super.key});
 
   @override
@@ -14,12 +96,18 @@ class Home extends StatefulWidget {
 
 class _MyAppState extends State<Home> {
   late Future<Album> futureAlbum;
-  late Future<String> token;
+  String token = "";
+
+  Future<void> _getToken(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString(key) as String;
+  }
+
   @override
   void initState() {
     super.initState();
     futureAlbum = fetchAlbum();
-    // token = getToken();
+    _getToken("token");
   }
 
   @override
@@ -38,12 +126,10 @@ class _MyAppState extends State<Home> {
             future: futureAlbum,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                // print(snapshot.data!.title);
                 return Text('token: ${token}');
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
-
               // By default, show a loading spinner.
               return const CircularProgressIndicator();
             },
@@ -93,8 +179,10 @@ class Album {
     );
   }
 }
+
 class Token {
   final String token;
+
   const Token({
     required this.token,
   });
